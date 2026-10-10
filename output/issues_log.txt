@@ -1,0 +1,7 @@
+NSW Solar & Battery Data Quality Issues Log
+==================================================
+Source: Clean Energy Regulator (CER)
+URL: https://cer.gov.au
+
+- Solar: Filtered to NSW (2000-2999): 648 of 2811 rows
+- Battery: Filtered to NSW (2000-2999): 628 of 2473 rows

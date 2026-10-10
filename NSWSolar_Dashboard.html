@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSW Solar & Battery Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Calibri,Arial,sans-serif;background:#f5f5f5;color:#2C3E50}
+.tabs{display:flex;background:#1B5E20;padding:0}
+.tab{padding:14px 28px;color:#fff;cursor:pointer;font-size:15px;border-bottom:3px solid transparent}
+.tab:hover{background:#2E7D32}
+.tab.active{border-bottom:3px solid #F9A825;font-weight:bold}
+.page{display:none;padding:20px;max-width:1920px;margin:0 auto}
+.page.active{display:block}
+h2{color:#1B5E20;font-size:22px;margin-bottom:15px}
+.cards{display:flex;gap:15px;margin-bottom:20px;flex-wrap:wrap}
+.card{background:#fff;border:1px solid #BDBDBD;border-radius:8px;padding:18px;min-width:200px;flex:1;text-align:center}
+.card-value{font-size:32px;font-weight:bold;color:#1B5E20}
+.card-value.blue{color:#1565C0}
+.card-value.red{color:#D32F2F}
+.card-value.green{color:#388E3C}
+.card-sub{font-size:12px;color:#7F8C8D;margin-top:4px}
+.chart-row{display:flex;gap:15px;margin-bottom:20px;flex-wrap:wrap}
+.chart-box{background:#fff;border:1px solid #BDBDBD;border-radius:8px;padding:15px;flex:1;min-width:400px}
+.chart-full{background:#fff;border:1px solid #BDBDBD;border-radius:8px;padding:15px;margin-bottom:20px}
+.note{font-size:11px;color:#7F8C8D;font-style:italic;margin-top:15px;padding:10px;background:#fafafa;border-radius:5px}
+canvas{max-height:380px}
+</style>
+</head>
+<body>
+<div class="tabs">
+  <div class="tab active" onclick="show('p1',this)">NSW Solar Overview</div>
+  <div class="tab" onclick="show('p2',this)">Growth Trends</div>
+  <div class="tab" onclick="show('p3',this)">Battery Uptake</div>
+</div>
+
+<!-- PAGE 1 -->
+<div id="p1" class="page active">
+  <h2>NSW Rooftop Solar Installations - Overview</h2>
+  <div class="cards">
+    <div class="card"><div class="card-value">1,167,788</div><div class="card-sub">Total Solar Installations</div></div>
+    <div class="card"><div class="card-value">116,641</div><div class="card-sub">Peak Year (2021)</div></div>
+    <div class="card"><div class="card-value">645</div><div class="card-sub">NSW Postcodes with Solar</div></div>
+    <div class="card"><div class="card-value">97,456</div><div class="card-sub">2026 Projected (8 months data)</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box"><canvas id="yearlyLine"></canvas></div>
+    <div class="chart-box"><canvas id="topPC"></canvas></div>
+  </div>
+  <div class="chart-full"><canvas id="quarterlyBar"></canvas></div>
+  <div class="note">Data source: Clean Energy Regulator (CER) — cer.gov.au | NSW postcodes 2000–2999 | Solar data covers 2011–2026 (2026 includes 8 months, Jan–Aug).</div>
+  <div class="note">Also checked CER wind installation data but found only a handful of residential wind turbines in NSW compared to over 1 million solar installations, so focused the analysis on solar and battery as the main distributed energy resources.</div>
+</div>
+
+<!-- PAGE 2 -->
+<div id="p2" class="page">
+  <h2>Solar Growth Trends - Year on Year</h2>
+  <div class="cards">
+    <div class="card"><div class="card-value green">+48.2%</div><div class="card-sub">Biggest Growth: 2017</div></div>
+    <div class="card"><div class="card-value red">-36.3%</div><div class="card-sub">Biggest Decline: 2012</div></div>
+    <div class="card"><div class="card-value">116K+</div><div class="card-sub">COVID Peak: 2020-21</div></div>
+  </div>
+  <div class="chart-full"><canvas id="comboChart"></canvas></div>
+  <div class="chart-full"><canvas id="cumulChart"></canvas></div>
+</div>
+
+<!-- PAGE 3 -->
+<div id="p3" class="page">
+  <h2>NSW Home Battery Installations</h2>
+  <div class="cards">
+    <div class="card"><div class="card-value blue">185,056</div><div class="card-sub">Total Installations (Jul 2025 – Aug 2026)</div></div>
+    <div class="card"><div class="card-value blue">166,629</div><div class="card-sub">2026 Projected Full Year (from 8 months data)</div></div>
+    <div class="card"><div class="card-value">628</div><div class="card-sub">NSW Postcodes with Batteries</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box"><canvas id="batYear"></canvas></div>
+    <div class="chart-box"><canvas id="batMonthly"></canvas></div>
+  </div>
+  <div class="note">Note: This dataset covers battery installations from July 2025 to August 2026 — 14 months of CER postcode-level data. 2025 contains 6 months (Jul–Dec, 73,970 installations) and 2026 contains 8 months (Jan–Aug, 111,086 installations), so raw year totals are not directly comparable. The 2026 projected full year of 166,629 is extrapolated from 8 months of data. The federal Cheaper Home Batteries rebate, which started 1 July 2025, coincides with the beginning of this dataset and is a likely driver of the volumes recorded. Falling battery costs and changes to solar feed-in tariffs are also contributing factors. Data source: Clean Energy Regulator — cer.gov.au.</div>
+</div>
+
+<script>
+function show(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+
+const gold='#F9A825',blue='#1565C0',dgreen='#1B5E20',red='#D32F2F',green='#388E3C';
+
+// Page 1: Yearly line
+new Chart('yearlyLine',{type:'line',data:{labels:[2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],datasets:[{label:'Installations',data:[87076, 55426, 36345, 38387, 34508, 30472, 45163, 62484, 81391, 116325, 116641, 102092, 113874, 102536, 80097, 64971],borderColor:gold,backgroundColor:gold+'33',borderWidth:3,pointRadius:5,fill:true}]},options:{responsive:true,plugins:{title:{display:true,text:'Solar Installations by Year',font:{size:16,weight:'bold'}}}}});
+
+// Page 1: Top postcodes bar
+new Chart('topPC',{type:'bar',data:{labels:["Marsden Park / Box Hill (2765)", "Kellyville / Rouse Hill (2155)", "Central Coast (Wyong) (2259)", "Campbelltown (2560)", "Liverpool (2170)", "Lismore / Byron (2480)", "Camden (2570)", "Dubbo (2830)", "Port Macquarie (2444)", "Wagga Wagga (2650)"],datasets:[{label:'Total Installations',data:[15393, 13996, 12886, 12123, 11759, 11738, 11433, 11147, 11048, 10784],backgroundColor:gold}]},options:{indexAxis:'y',responsive:true,plugins:{title:{display:true,text:'Top 10 NSW Postcodes',font:{size:16,weight:'bold'}},legend:{display:false}}}});
+
+// Page 1: Quarterly
+new Chart('quarterlyBar',{type:'bar',data:{labels:["2011 Q1", "2011 Q2", "2011 Q3", "2011 Q4", "2012 Q1", "2012 Q2", "2012 Q3", "2012 Q4", "2013 Q1", "2013 Q2", "2013 Q3", "2013 Q4", "2014 Q1", "2014 Q2", "2014 Q3", "2014 Q4", "2015 Q1", "2015 Q2", "2015 Q3", "2015 Q4", "2016 Q1", "2016 Q2", "2016 Q3", "2016 Q4", "2017 Q1", "2017 Q2", "2017 Q3", "2017 Q4", "2018 Q1", "2018 Q2", "2018 Q3", "2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3", "2019 Q4", "2020 Q1", "2020 Q2", "2020 Q3", "2020 Q4", "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4", "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4", "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4", "2024 Q1", "2024 Q2", "2024 Q3", "2024 Q4", "2025 Q1", "2025 Q2", "2025 Q3", "2025 Q4", "2026 Q1", "2026 Q2", "2026 Q3"],datasets:[{label:'Quarterly Installations',data:[34980, 39857, 6103, 6136, 7358, 23356, 9910, 14802, 9488, 8512, 9778, 8567, 7489, 9137, 10429, 11332, 9341, 8426, 8917, 7824, 6595, 7075, 7585, 9217, 9327, 10018, 11834, 13984, 13450, 15017, 16309, 17708, 16183, 18315, 20771, 26122, 23958, 26621, 31245, 34501, 31563, 31044, 24609, 29425, 20741, 23411, 27454, 30486, 24399, 26619, 30590, 32266, 26348, 26487, 24638, 25063, 19285, 17083, 18846, 24883, 23674, 28969, 12328],backgroundColor:gold}]},options:{responsive:true,plugins:{title:{display:true,text:'Quarterly Installations',font:{size:16,weight:'bold'}},legend:{display:false}},scales:{x:{ticks:{maxRotation:45}}}}});
+
+// Page 2: Combo
+new Chart('comboChart',{type:'bar',data:{labels:[2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],datasets:[{type:'bar',label:'Installations',data:[87076, 55426, 36345, 38387, 34508, 30472, 45163, 62484, 81391, 116325, 116641, 102092, 113874, 102536, 80097, 64971],backgroundColor:gold,order:2},{type:'line',label:'Growth %',data:[0.0, -36.3, -34.4, 5.6, -10.1, -11.7, 48.2, 38.4, 30.3, 42.9, 0.3, -12.5, 11.5, -10.0, -21.9, 21.7],borderColor:red,borderWidth:2,pointRadius:4,yAxisID:'y1',order:1}]},options:{responsive:true,plugins:{title:{display:true,text:'Installations vs Growth Rate',font:{size:16,weight:'bold'}}},scales:{y:{position:'left',title:{display:true,text:'Installations'}},y1:{position:'right',title:{display:true,text:'Growth %'},grid:{drawOnChartArea:false}}}}});
+
+// Page 2: Cumulative
+new Chart('cumulChart',{type:'line',data:{labels:[2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],datasets:[{label:'Cumulative',data:[87076, 142502, 178847, 217234, 251742, 282214, 327377, 389861, 471252, 587577, 704218, 806310, 920184, 1022720, 1102817, 1167788],borderColor:dgreen,backgroundColor:dgreen+'22',borderWidth:3,pointRadius:5,fill:true}]},options:{responsive:true,plugins:{title:{display:true,text:'Cumulative NSW Solar Installations',font:{size:16,weight:'bold'}}}}});
+
+// Page 3: Battery yearly
+new Chart('batYear',{type:'bar',data:{labels:[2025, 2026],datasets:[{label:'Installations',data:[73970, 111086],backgroundColor:blue}]},options:{responsive:true,plugins:{title:{display:true,text:'Battery Installations by Year',font:{size:16,weight:'bold'}},legend:{display:false}}}});
+
+// Page 3: Battery monthly
+new Chart('batMonthly',{type:'line',data:{labels:["2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08"],datasets:[{label:'Monthly Installations',data:[10805, 8948, 11150, 12733, 13870, 16464, 10395, 14885, 20856, 32329, 7493, 9844, 9980, 5304],borderColor:blue,borderWidth:2,pointRadius:3}]},options:{responsive:true,plugins:{title:{display:true,text:'Monthly Battery Trend',font:{size:16,weight:'bold'}}},scales:{x:{ticks:{maxRotation:45}}}}});
+</script>
+</body>
+</html>
