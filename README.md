@@ -55,7 +55,7 @@ Place the CER source CSVs in the `data/` folder. The pipeline reads them, filter
 - NSW has recorded over **1.1 million rooftop solar installations** since 2011
 - Growth peaked in 2020–2021 and has moderated but remains strong
 - Projected 2026 battery installations (166,629) about 13% above projected 2025, based on 8 months of data — the federal Cheaper Home Batteries rebate from 1 July 2025 coincides with the start of the dataset
-- Blacktown, Penrith, and Liverpool postcodes consistently lead in installation volumes
+- - Marsden Park/Box Hill (2765), Kellyville/Rouse Hill (2155) and Central Coast/Wyong (2259) are the top three postcodes by total installations
 
 ## Tools
 
