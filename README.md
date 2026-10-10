@@ -2,7 +2,7 @@
 
 Interactive dashboard tracking rooftop solar and battery installations across New South Wales, built from Clean Energy Regulator (CER) postcode-level data.
 
-**[View Dashboard](https://bhanurekhab.github.io/nsw-solar-tracker/NSWSolar_Dashboard.html)**
+**[View Dashboard](https://bhanurekhab.github.io/nsw-solar-dashboard/NSWSolar_Dashboard.html)**
 
 ## What This Project Does
 
